@@ -6,6 +6,8 @@ from pygame_widgets.widget import WidgetBase
 
 import itertools
 
+from text_render import TextRender
+
 default_args = {
     'background_color': (250, 250, 250),
     'text_color': (10, 10, 10),
@@ -33,11 +35,13 @@ class Table(WidgetBase):
 
         self.data = kwargs.get('data', list(list()))
 
+        self.text_font = TextRender(self.parameters.get('font_size'),
+                                    text_color=self.parameters.get('text_color'))
+
         self.columns = columns
         self.rows = rows
         self.cell_width = fill_stream(kwargs.get('cell_width', list()), width, self.columns)
         self.cell_height = fill_stream(kwargs.get('cell_height', list()), height, self.rows)
-        self.text_font = self.parameters.get('font', pygame.font.SysFont('calibri', self.parameters['font_size']))
         self.highlights: Dict[Tuple[int, int], Tuple[int, int, int]] = self.parameters.get('highlights', dict())
 
     def set_data(self, data: Sequence[Sequence[str]]):
@@ -59,7 +63,7 @@ class Table(WidgetBase):
                 if (row, column) in self.highlights:
                     pygame.draw.rect(self.win, self.highlights[(row, column)], (x, y, width, height))
 
-                text = self.text_font.render(cell_data, True, self.parameters['text_color'])
+                text = self.text_font.render(cell_data)
                 self.win.blit(text, (x, y, width, height))
 
                 x += width

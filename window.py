@@ -1,7 +1,7 @@
 from array import array
 import random
 from time import sleep
-from typing import Dict, Any, Optional, Tuple
+from typing import Dict, Any, Optional, Tuple, List
 
 import pygame
 import chess
@@ -14,12 +14,15 @@ from pieces import PieceRenderer
 
 import datetime as dt
 
+from stats import Stats
+
 default_args = {
     'window': (1400, 1000),
     'chessboard_begin': (100, 100),
     'background_color': (50, 50, 50)
 }
 
+stockfish_path = ''
 
 class Window:
 
@@ -44,7 +47,8 @@ class Window:
         self.game = Game()
         self.board = ChessBoard(self.screen, self.config)
 
-        self._game = GameView(self.screen, 980, 100, 200, 800)
+        self._game = GameView(self.screen, 980, 170, 300, 800)
+        self.stats = Stats(self.screen, 980, 100, 300, 60)
 
     def main_loop(self):
         loop = True
@@ -54,10 +58,12 @@ class Window:
         moves = list()
         saved = False
 
-        self._game.game_state().headers['White'] = 'player'
-        self._game.game_state().headers['Black'] = 'random'
+        self._game.game_state().game().headers['White'] = 'player'
+        self._game.game_state().game().headers['Black'] = 'random'
 
         self._game.register_on_change(lambda game: self.board.set_board(game.board()))
+
+        engine = chess.engine.SimpleEngine.popen_uci(stockfish_path)
 
         while loop:
 
@@ -67,9 +73,21 @@ class Window:
                 #moves.append(random.sample(legal_moves, 1)[0])
                 #redraw = True
 
+            def line(board: chess.Board, moves: List[chess.Move]) -> List[str]:
+                result = list()
+                for move in moves:
+                    result.append(board.san(move))
+                    board.push(move)
+                for _ in moves:
+                    board.pop()
+                return result
+
             for move in moves:
                 self._game.apply_moves([(move, '')])
                 chessboard.push(move)
+                info_multipv = engine.analyse(self._game.game_state().board(), chess.engine.Limit(time=0.2), multipv=3)
+                stats = [(info['score'].pov(chess.WHITE), line(chessboard, info.get('pv', list()))) for info in info_multipv]
+                self.stats.set_stats(stats)
 
             moves.clear()
 
@@ -82,7 +100,7 @@ class Window:
 
             events = pygame.event.get()
             self._game.listen(events)
-
+            self.stats.listen(events)
             for event in events:
                 if event.type == pygame.QUIT:
                     loop = False
@@ -116,7 +134,7 @@ class Window:
             self.board.draw_pieces(self.piece_renderer)
 
             self._game.draw()
-
+            self.stats.draw()
             if selected_square is not None:
                 for move in filter(lambda x: x.from_square == selected_square, chessboard.legal_moves):
                     rect = self.board.translate_rect_inv(move.to_square)
@@ -128,4 +146,5 @@ class Window:
 
             self.clock.tick(60)
 
+        engine.quit()
         pygame.quit()

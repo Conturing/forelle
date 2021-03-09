@@ -77,26 +77,9 @@ class GameView(Table):
 
         self.set_data(data)
         super().draw()
-        # pygame.draw.rect(self.win, self.config['background_color'], (self._x, self._y, self._width, self._height))
-        # temp_board = chess.Board()
-        # for ply, node in enumerate(self.game.mainline()):
-        #     if ply % 2 == 0:
-        #         text = self.text_font.render(f'{ply // 2 + 1}. ', True, self.config['text_color'])
-        #         self.win.blit(text, (self._x + 4, self._y + 5 + 20 * (ply // 2)))
-        #     san = temp_board.san(node.move)
-        #     temp_board.push(node.move)
-        #     text = self.text_font.render(san, True, self.config['text_color'])
-        #     if node == self.current_game:
-        #         pygame.draw.rect(self.win,
-        #                          self.config['highlight_color'],
-        #                          (self._x + 35 + (self._width // 2) * (ply % 2),
-        #                           self._y + 5 + 20 * (ply // 2),
-        #                           self._width//2,
-        #                           20))
-        #     self.win.blit(text, (self._x + 35 + (self._width // 2) * (ply % 2), self._y + 5 + 20 * (ply // 2)))
 
-    def game_state(self) -> Game:
-        return self.game
+    def game_state(self) -> GameNode:
+        return self.current_game
 
     def apply_moves(self, moves: List[Tuple[chess.Move, str]]):
         for move, comment in moves:
