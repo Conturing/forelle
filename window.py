@@ -57,13 +57,15 @@ class Window:
         self._game.game_state().headers['White'] = 'player'
         self._game.game_state().headers['Black'] = 'random'
 
+        self._game.register_on_change(lambda game: self.board.set_board(game.board()))
+
         while loop:
 
             legal_moves = list(chessboard.legal_moves)
 
-            if self.board.game_state().turn == chess.BLACK and len(legal_moves) > 0 and not saved:
-                moves.append(random.sample(legal_moves, 1)[0])
-                redraw = True
+            #if self.board.game_state().turn == chess.BLACK and len(legal_moves) > 0 and not saved:
+                #moves.append(random.sample(legal_moves, 1)[0])
+                #redraw = True
 
             for move in moves:
                 self._game.apply_moves([(move, '')])
@@ -78,8 +80,10 @@ class Window:
                                                          f'- {dt.datetime.now():%Y-%m-%dT%H-%M-%S}.pgn', 'w'),
                       end='\n\n')
 
-            for event in pygame.event.get():
-                self._game.listen(event)
+            events = pygame.event.get()
+            self._game.listen(events)
+
+            for event in events:
                 if event.type == pygame.QUIT:
                     loop = False
                 if event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE:
@@ -108,21 +112,19 @@ class Window:
                     else:
                         selected_square = None
 
-            if redraw:
-                redraw = False
-                self.board.draw_board()
-                self.board.draw_pieces(self.piece_renderer)
+            self.board.draw_board()
+            self.board.draw_pieces(self.piece_renderer)
 
-                self._game.draw()
+            self._game.draw()
 
-                if selected_square is not None:
-                    for move in filter(lambda x: x.from_square == selected_square, chessboard.legal_moves):
-                        rect = self.board.translate_rect_inv(move.to_square)
-                        pygame.draw.circle(self.screen,
-                                           (0, 0, 0),
-                                           (rect[0] + rect[2] // 2, rect[1] + rect[3] // 2),
-                                           5)
-                pygame.display.update()
+            if selected_square is not None:
+                for move in filter(lambda x: x.from_square == selected_square, chessboard.legal_moves):
+                    rect = self.board.translate_rect_inv(move.to_square)
+                    pygame.draw.circle(self.screen,
+                                       (0, 0, 0),
+                                       (rect[0] + rect[2] // 2, rect[1] + rect[3] // 2),
+                                       5)
+            pygame.display.update()
 
             self.clock.tick(60)
 

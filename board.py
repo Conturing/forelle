@@ -59,3 +59,6 @@ class ChessBoard:
 
     def game_state(self) -> chess.Board:
         return self.board
+
+    def set_board(self, board):
+        self.board = board
