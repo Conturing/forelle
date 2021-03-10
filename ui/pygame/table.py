@@ -1,14 +1,12 @@
-from typing import Optional, Sequence, Iterable, Iterator, Dict, Tuple
+from typing import Optional, Sequence, Dict, Tuple
 
 import pygame
 from pygame import Surface
 from pygame_widgets.widget import WidgetBase
 
-import itertools
-
-from ui.grid import Grid
-from ui.text_render import TextRender
-from ui.frame import Frame
+from ui.pygame.grid import Grid
+from ui.pygame.text_render import TextRender
+from ui.pygame.frame import Frame
 
 default_args = {
     'background_color': (250, 250, 250),

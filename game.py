@@ -5,9 +5,9 @@ import pygame
 import chess
 from chess.pgn import Game, GameNode
 
-from ui.table import Table
+from ui.pygame.table import Table
 
-default_args = {
+default_theme = {
     'background_color': (255, 255, 255),
     'text_color': (10, 10, 10),
     'text_padding': (4, 5, 0, 0),  # left up right bottom
@@ -17,7 +17,7 @@ default_args = {
 }
 
 
-class GameView(Table):
+class GameControl(Table):
 
     game: Game
     current_game: GameNode
@@ -34,8 +34,8 @@ class GameView(Table):
 
         self.on_change_handlers = list()
 
-        self.config = default_args.copy()
-        self.config.update(**kwargs)
+        self.theme = default_theme.copy()
+        self.theme.update(**kwargs)
 
     def listen(self, events: Sequence[pygame.event.Event]):
         super().listen(events)
@@ -69,7 +69,7 @@ class GameView(Table):
             temp_board.push(node.move)
             column_data.append(san)
             if node == self.current_game:
-                self.highlights = {(ply // 2, ply % 2 + 1): self.config['highlight_color']}
+                self.highlights = {(ply // 2, ply % 2 + 1): self.theme['highlight_color']}
 
         if len(column_data) > 0:
             data.append(column_data)
