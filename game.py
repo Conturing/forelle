@@ -1,12 +1,11 @@
-from typing import List, Tuple, Sequence, Callable, Any, Optional
+from typing import List, Tuple, Sequence, Callable, Optional
 
 import pygame
-from pygame_widgets.widget import WidgetBase
 
 import chess
 from chess.pgn import Game, GameNode
 
-from table import Table
+from ui.table import Table
 
 default_args = {
     'background_color': (255, 255, 255),
@@ -26,7 +25,7 @@ class GameView(Table):
     on_change_handlers: List[OnChangeHandle]
 
     def __init__(self, screen: pygame.Surface, x: int, y: int, width: int, height: int, game: Optional[Game] = None, **kwargs):
-        super().__init__(screen, x, y, width, height, 3, height // 20, cell_width=[35], **kwargs)
+        super().__init__(screen, x, y, width, height, columns=3, rows=height // 20, cell_width=[35], **kwargs)
 
         if game is None:
             game = Game()

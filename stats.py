@@ -1,12 +1,10 @@
 from typing import Optional, List, Tuple, Sequence
 
 import pygame
-from chess import Move
-from chess.engine import Score
 from pygame import Surface, Color
 from pygame_widgets.widget import WidgetBase
 
-from text_render import TextRender
+from ui.text_render import TextRender
 
 
 class Stats(WidgetBase):
